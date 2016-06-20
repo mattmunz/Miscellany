@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  For bootstrapping purposes only. Once Babe is built this script doesn't need to be used. 
+  -->
+<project name="Miscellany" default="build">
+  
+  <description>Commands for building and managing assertive server instances</description>
+
+  <property environment="system"/>
+  <property file="build.properties"/>
+  
+  <import file="${system.MM_PROJECTS_DIRECTORY}/Babe/source/xml/Component.build.xml" 
+          as=""/>
+  
+  <path id="buildPath">
+    
+    <pathelement location="${resourcesDirectory}/Guava/guava-18.0.jar"/>
+    <pathelement location="${resourcesDirectory}/Commons/Logging/commons-logging-1.2/commons-logging-1.2.jar"/>
+    <pathelement location="${resourcesDirectory}/Commons/BeanUtils/commons-beanutils-1.9.2/commons-beanutils-1.9.2.jar"/>
+
+    <pathelement path="${jaxrsAPIJar}"/>
+    <pathelement path="${jerseyMediaJSONJacksonJar}"/>
+
+    <pathelement path="${jacksonDirectory}/core/jackson-annotations-2.7.0.jar"/>
+    <pathelement location="${jacksonDirectory}/datatype/jackson-datatype-jsr310-2.7.0.jar"/>
+    <pathelement location="${jacksonDirectory}/core/jackson-databind-2.7.0.jar"/> 
+    <pathelement location="${jacksonDirectory}/core/jackson-core-2.7.0.jar"/> 
+  </path>  
+
+  <target name="build" description="Build the service from source">
+
+    <antcall target="buildComponent">
+      <param name="componentClasspathId" value="buildPath"/>
+    </antcall>
+  </target>
+</project>
