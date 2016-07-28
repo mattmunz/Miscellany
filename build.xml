@@ -34,4 +34,9 @@
       <param name="componentClasspathId" value="buildPath"/>
     </antcall>
   </target>
+  
+  <target name="clean" description="Clean the build dir">
+
+    <antcall target="cleanComponent"/>
+  </target>
 </project>

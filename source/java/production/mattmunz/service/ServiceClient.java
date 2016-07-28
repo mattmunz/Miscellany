@@ -1,6 +1,6 @@
 package mattmunz.service;
 
-import static java.util.logging.Level.SEVERE;  
+import static java.util.logging.Level.SEVERE;   
 import static java.util.logging.Logger.getLogger;
 import static javax.ws.rs.client.ClientBuilder.newClient;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -62,6 +62,7 @@ public class ServiceClient
   protected <T> void post(String path, T body)
   {
     // TODO Use static imports
+    // TODO This URL building is redundant with getTarget, below
     Response response 
       = ClientBuilder.newClient().target("http://" + host + ":" + port + "/" + applicationName)
               .register(JacksonFeature.class)
@@ -83,6 +84,8 @@ public class ServiceClient
     }
   }
 
+  // TODO applicationName is actually a class variable...
+  // TODO Should use UriBuilder
   private WebTarget getTarget(String applicationName, String path)
   {
     String uri = "http://" + host + ":" + port + "/" + applicationName;
