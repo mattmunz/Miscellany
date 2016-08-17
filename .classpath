@@ -9,5 +9,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jackson2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/BeanUtils"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Commons Logging"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Mongo DB Driver"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
