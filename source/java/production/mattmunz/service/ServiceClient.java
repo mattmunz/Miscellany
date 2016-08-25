@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -42,24 +43,41 @@ public class ServiceClient
     this.applicationName = applicationName;
   }
 
+  /**
+   * @param path Will be URL escaped
+   */
   protected <T> List<T> get(String path, GenericType<List<T>> responseType)
   {
-    WebTarget target = getTarget(applicationName, path);
-  
-    Builder invocationBuilder = target.request(APPLICATION_JSON);
-    
-  	  try { return invocationBuilder.get(responseType); }
-  	  catch(NotFoundException e) 
-  	  { 
-  	    String message = "Entity not found for " + target.getUri();
-  		
-      logger.log(SEVERE, message, e); 
-  		
-  		  throw new NotFoundException(message, e.getResponse(), e);
-    }
+    return get(getTarget(path), responseType);
   }
 
-  protected <T> void post(String path, T body)
+  protected <T> List<T> get(WebTarget target, GenericType<List<T>> responseType)
+  {
+    Builder invocationBuilder = target.request(APPLICATION_JSON);
+    
+    try { return invocationBuilder.get(responseType); }
+  	  catch(NotFoundException e) 
+    { 
+  	    // TODO Similar catch blocks should be refactored together
+  		
+  	    String message = "Entity not found for " + target.getUri();
+  		
+  	    logger.log(SEVERE, message, e); 
+  		
+  	    throw new NotFoundException(message, e.getResponse(), e);
+    }
+    catch (ProcessingException e)
+  	  {
+  		  String message = "Couldn't process (maybe couldn't connect to) " + target.getUri();
+  		
+  		  logger.log(SEVERE, message, e); 
+  		
+  		  // TODO Better exception type here
+  		  throw new RuntimeException(message, e);  		
+  	  }
+  }
+
+  protected <T> Response post(String path, T body)
   {
     // TODO Use static imports
     // TODO This URL building is redundant with getTarget, below
@@ -82,15 +100,25 @@ public class ServiceClient
       // TODO Find a better exception type
       throw new RuntimeException(message);
     }
+    
+    return response;
   }
 
-  // TODO applicationName is actually a class variable...
-  // TODO Should use UriBuilder
+  protected WebTarget getTarget(String path) { return getTarget(applicationName, path); }
+  
+  /**
+   * TODO applicationName is actually a class variable...
+   * TODO Should use UriBuilder
+   * @param path Will be URL escaped. If you want parameters, use the WebTarget API to add them.
+   */
   private WebTarget getTarget(String applicationName, String path)
   {
     String uri = "http://" + host + ":" + port + "/" + applicationName;
     
-    return newClient().target(uri).register(JacksonFeature.class)
-                      .register(ObjectMapperProvider.class).path(path);
+    WebTarget target 
+      = newClient().target(uri).register(JacksonFeature.class)
+                   .register(ObjectMapperProvider.class).path(path);
+    
+    return target;
   }
 }

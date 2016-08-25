@@ -2,6 +2,7 @@ package mattmunz.persistence.mongodb;
 
 import java.util.function.BiConsumer; 
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.bson.Document;
@@ -25,6 +26,15 @@ public abstract class MongoRepository
     this.clientFactory = clientFactory;
     this.dbName = dbName; 
     this.collectionName = collectionName;
+  }
+
+  protected <V> void 
+    doWithCollection(Consumer<MongoCollection<Document>> consumer)
+  {
+    try (MongoClient client = getClient())
+    {
+      consumer.accept(getCollection(client)); 
+    }
   }
 
   protected <V> void 
